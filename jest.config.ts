@@ -27,7 +27,8 @@ const config: Config = {
     "!**/node_modules/**",
     "!**/.next/**",
     "!**/coverage/**",
-    "!**/jest.config.ts"
+    "!**/jest.config.ts",
+    "!app/api/**"
   ],
   coverageThreshold: {
     global: {

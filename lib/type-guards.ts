@@ -1,17 +1,17 @@
-import { Center, Service, Booking, ApiError } from '@/types/domain';
+import { Center, Service, Booking, ApiError } from "@/types/domain";
 
 /**
  * Type guard to check if a value is a string
  */
 function isString(value: unknown): value is string {
-  return typeof value === 'string';
+  return typeof value === "string";
 }
 
 /**
  * Type guard to check if a value is a number
  */
 function isNumber(value: unknown): value is number {
-  return typeof value === 'number' && !isNaN(value);
+  return typeof value === "number" && !isNaN(value);
 }
 
 /**
@@ -25,7 +25,7 @@ function isArray(value: unknown): value is unknown[] {
  * Type guard to check if a value is a non-null object
  */
 function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**
@@ -101,4 +101,3 @@ export function isApiError(value: unknown): value is ApiError {
     (value.statusCode === undefined || isNumber(value.statusCode))
   );
 }
-

@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --fix",
     "test": "jest --verbose=false",
     "test:watch": "jest --watch --verbose=false",
-    "test:coverage": "jest --coverage --verbose=false",
+    "test:coverage": "jest --coverage",
     "type-check": "tsc --noEmit",
     "validate": "npm run type-check && npm run lint && npm run test",
     "review": "npm run type-check && npm run lint && npm run test && npm run build && npm run start",

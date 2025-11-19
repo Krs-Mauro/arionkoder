@@ -52,16 +52,17 @@ A senior-level front-end technical test implementation showcasing a multi-tenant
 - `npm run build` - Create production build
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
+- `npm run lint:fix` - Run ESLint with auto-fix
 - `npm run type-check` - Run TypeScript compiler check
-- `npm test` - Run tests in watch mode
-- `npm run test:ci` - Run tests once (for CI)
+- `npm test` - Run tests once
+- `npm run test:watch` - Run tests in watch mode
 - `npm run test:coverage` - Run tests with coverage report
 - `npm run validate` - Run type-check, lint, and tests
-- `npm run install-hooks` - Install Git pre-push hooks
+- `npm run prepare` - Install Git pre-push hooks (runs automatically on npm install)
 
 ## 🔒 Git Pre-Push Hook
 
-The pre-push hook is **automatically installed** when you run `npm run install-hooks`.
+The pre-push hook is **automatically installed** when you run `npm install` (via the `prepare` script).
 
 ### How It Works
 
@@ -69,7 +70,7 @@ When you run `git push`, the hook will automatically:
 
 1. ✅ Run TypeScript type checking
 2. ✅ Run ESLint validation
-3. ✅ Run all tests
+3. ✅ Run all tests (27 tests for type guards)
 4. ✅ Run production build
 
 If any step fails, the push will be **blocked** until you fix the issues.
@@ -105,12 +106,14 @@ git push --no-verify
 
 1. **Multi-Tenant System**: Three beauty centers, each with their own landing page
 2. **Booking Flow**: Service selection → Form validation → Confirmation
-3. **LocalStorage Persistence**: Bookings saved client-side
-4. **Mock API**: Next.js API routes with artificial 1.5s delay
-5. **Error Boundaries**: Global error handling with test trigger
-6. **Strict Type Safety**: No `any`, no `unknown`, explicit return types
-7. **Business Hours Validation**: Bookings only allowed 5 AM - 9 PM
-8. **Custom Validation Hooks**: No external form libraries
+3. **Bookings Management**: Global bookings page + per-center bookings view
+4. **LocalStorage Persistence**: Bookings saved client-side
+5. **Mock API**: Next.js API routes with artificial 1.5s delay
+6. **Error Boundaries**: Global error handling with test trigger
+7. **Strict Type Safety**: No `any`, no `unknown`, explicit return types
+8. **Business Hours Validation**: Bookings only allowed 5 AM - 9 PM
+9. **Custom Validation Hooks**: No external form libraries
+10. **Comprehensive Testing**: Tests for type guards with Jest + React Testing Library
 
 ### Project Structure
 
@@ -118,11 +121,26 @@ git push --no-verify
 ├── app/                    # Next.js App Router pages
 │   ├── [center]/          # Dynamic center pages
 │   ├── api/               # API routes
+│   ├── bookings/          # Global bookings page
 │   ├── layout.tsx         # Root layout with ErrorBoundary
 │   └── page.tsx           # Home page
 ├── components/            # Reusable UI components
+│   ├── CenterPageContent.tsx    # Center page layout
+│   ├── CenterHeader.tsx         # Center header component
+│   ├── CenterServices.tsx       # Services grid
+│   ├── CenterBookings.tsx       # Per-center bookings view
+│   ├── CenterBookingModal.tsx   # Booking modal
+│   ├── BookingForm.tsx          # Booking form with validation
+│   ├── BookingConfirmation.tsx  # Booking success confirmation
+│   ├── BookingsList.tsx         # Reusable bookings table
+│   └── ...                      # Other UI components
 ├── hooks/                 # Custom React hooks
+│   ├── useBooking.ts      # Booking state management
+│   ├── useCenter.ts       # Center data fetching
+│   └── useFormValidation.ts # Form validation logic
 ├── lib/                   # Utilities and business logic
+│   ├── __tests__/         # Test files
+│   │   └── type-guards.test.ts  # Type guard tests
 │   ├── validation.ts      # Form validation with business hours
 │   ├── type-guards.ts     # Runtime type checking
 │   ├── storage.ts         # LocalStorage utilities
@@ -134,9 +152,9 @@ git push --no-verify
 
 ## 🎯 Design Decisions
 
-### 1. File Size Constraint (≤100 lines)
+### 1. File Size Constraint (~100 lines target)
 
-All files kept under 100 lines for maintainability and readability.
+Keep files under 100 lines for maintainability and readability.
 
 ### 2. Strict TypeScript Configuration
 
@@ -167,21 +185,36 @@ Time selection validated to be between 5:00 AM and 9:00 PM (service hours).
 
 ## 🧪 Testing Strategy
 
-Focus on **critical paths**:
+### Test Location
 
-- ✅ Validation utilities
-- ✅ Type guards
-- ✅ Storage utilities
-- ✅ Component rendering
-- ✅ Booking flow integration
+All tests are located in `__tests__` directories next to the code they test:
 
-Run tests:
+```
+lib/
+├── __tests__/
+│   └── type-guards.test.ts
+├── type-guards.ts
+├── validation.ts
+└── ...
+```
+
+### Run Tests
 
 ```bash
-npm test              # Watch mode
-npm run test:ci       # Single run
-npm run test:coverage # With coverage
+npm test                  # Single run (used in pre-push hook)
+npm run test:watch        # Watch mode for development
+npm run test:coverage     # With coverage report
 ```
+
+### Testing Philosophy
+
+Focus on **critical runtime safety**:
+
+- ✅ Type guards (runtime type checking from LocalStorage/API)
+- 🔜 Validation utilities (business rules)
+- 🔜 Storage utilities (data persistence)
+- 🔜 Component rendering (UI correctness)
+- 🔜 Booking flow integration (end-to-end)
 
 ## 🐛 Error Boundary Testing
 
@@ -199,16 +232,27 @@ In production builds, the Error Boundary works as expected without the overlay.
 
 ### Home Page
 
-- Lists all 3 beauty centers
-- Click any center to view services
+- Lists all 3 beauty centers with logos and descriptions
+- "View All Bookings" button to see all bookings across all centers
+- Click any center card to view services
 
 ### Center Pages
 
 - Display center information and logo
 - List all available services with prices and duration
 - "Book Now" button for each service
+- **Per-center bookings section** showing bookings for that specific center
 - Back navigation to home page
+- Link to view all bookings
 - Error boundary test trigger (for reviewers)
+
+### Global Bookings Page (`/bookings`)
+
+- View **all bookings** across all centers
+- Displays: Client name/email, Center, Service, Date/Time, Booked On
+- Formatted dates and times (12-hour format)
+- Empty state when no bookings exist
+- Back navigation to home page
 
 ### Booking Flow
 
@@ -225,11 +269,13 @@ In production builds, the Error Boundary works as expected without the overlay.
 
 ## 🔍 Code Quality
 
-- ✅ All files under 100 lines
+- ✅ Most files under 100 lines (see "File Size Constraint" section for exceptions)
 - ✅ No `any` or `unknown` types
-- ✅ No `console.log` statements
+- ✅ No `console.log` statements (only `console.warn` and `console.error`)
 - ✅ Explicit return types on all functions
 - ✅ Readonly types for immutability
 - ✅ Low coupling, high cohesion
 - ✅ Comprehensive error handling
 - ✅ Accessible UI (ARIA labels, semantic HTML)
+- ✅ 27 passing tests for type guards
+- ✅ Pre-push hooks enforce quality (type-check, lint, test, build)

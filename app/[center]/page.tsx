@@ -1,17 +1,14 @@
 "use client";
 
-import { useState, use, type ReactElement } from "react";
-import Link from "next/link";
+import { useState, use, useMemo, type ReactElement } from "react";
 import { useCenter } from "@/hooks/useCenter";
 import { useBooking } from "@/hooks/useBooking";
 import { Service, BookingFormData } from "@/types/domain";
+import { getBookingsByCenterId } from "@/lib/storage";
 import { Loading } from "@/components/Loading";
 import { ErrorMessage } from "@/components/ErrorMessage";
-import { ServiceCard } from "@/components/ServiceCard";
-import { BookingModal } from "@/components/BookingModal";
-import { BookingForm } from "@/components/BookingForm";
-import { BookingConfirmation } from "@/components/BookingConfirmation";
-import { ErrorTrigger } from "@/components/ErrorBoundary";
+import { CenterPageContent } from "@/components/CenterPageContent";
+import { CenterBookingModal } from "@/components/CenterBookingModal";
 
 interface CenterPageProps {
   params: Promise<{ center: string }>;
@@ -33,6 +30,16 @@ export default function CenterPage({ params }: CenterPageProps): ReactElement {
 
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Get bookings for this center (recomputes when center or bookingStatus changes)
+  // bookingStatus is intentionally included to refresh the list after a new booking
+  const centerBookings = useMemo(() => {
+    if (center === null) {
+      return [];
+    }
+    return getBookingsByCenterId(center.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [center, bookingStatus]);
 
   const handleBookService = (serviceId: string): void => {
     const service = center?.services.find((s) => s.id === serviceId);
@@ -75,100 +82,21 @@ export default function CenterPage({ params }: CenterPageProps): ReactElement {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Back Navigation */}
-        <div className="mb-6">
-          <Link
-            href="/"
-            className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium transition-colors"
-          >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Back to All Centers
-          </Link>
-        </div>
-
-        {/* Center Header */}
-        <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-          <div className="flex items-center mb-4">
-            <span className="text-6xl mr-4" role="img" aria-label="Center logo">
-              {center.logo}
-            </span>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900">
-                {center.name}
-              </h1>
-              <p className="text-gray-600 mt-2">{center.description}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Services Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Our Services
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {center.services.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                onBook={handleBookService}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Error Trigger for Testing */}
-        <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-sm text-yellow-800 mb-2">
-            <strong>For Reviewers:</strong> Test the Error Boundary by clicking
-            the button below
-          </p>
-          <ErrorTrigger />
-        </div>
-      </div>
-
-      {/* Booking Modal */}
-      <BookingModal
+    <>
+      <CenterPageContent
+        center={center}
+        centerBookings={centerBookings}
+        onBookService={handleBookService}
+      />
+      <CenterBookingModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title={
-          bookingStatus === "success"
-            ? "Booking Confirmed"
-            : `Book ${selectedService?.name ?? "Service"}`
-        }
-      >
-        {bookingStatus === "success" &&
-        booking !== null &&
-        selectedService !== null ? (
-          <BookingConfirmation
-            booking={booking}
-            service={selectedService}
-            onClose={handleCloseModal}
-          />
-        ) : (
-          <>
-            {bookingError !== null && <ErrorMessage message={bookingError} />}
-            <BookingForm
-              onSubmit={handleSubmitBooking}
-              isLoading={bookingStatus === "loading"}
-            />
-          </>
-        )}
-      </BookingModal>
-    </div>
+        selectedService={selectedService}
+        booking={booking}
+        bookingStatus={bookingStatus}
+        bookingError={bookingError}
+        onSubmit={handleSubmitBooking}
+      />
+    </>
   );
 }

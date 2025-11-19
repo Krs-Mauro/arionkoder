@@ -19,7 +19,7 @@ export function Input({
   const hasError = error !== undefined && error.length > 0;
 
   const baseClasses =
-    "w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors";
+    "w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors text-gray-900";
   const stateClasses = hasError
     ? "border-red-300 focus:ring-red-500 focus:border-red-500"
     : "border-gray-300 focus:ring-purple-500 focus:border-purple-500";

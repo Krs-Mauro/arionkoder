@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { saveBookingToStorage } from '@/lib/storage';
-import { validateBookingForm } from '@/lib/validation';
-import { AppError, ERROR_MESSAGES } from '@/lib/errors';
-import { CreateBookingRequest, CreateBookingResponse } from '@/types/api';
-import { Booking } from '@/types/domain';
+import { NextRequest, NextResponse } from "next/server";
+import { validateBookingForm } from "@/lib/validation";
+import { AppError, ERROR_MESSAGES } from "@/lib/errors";
+import { CreateBookingRequest, CreateBookingResponse } from "@/types/api";
+import { Booking } from "@/types/domain";
 
 /**
  * Artificial delay to simulate network latency
@@ -25,7 +24,9 @@ function generateBookingId(): string {
  */
 export async function POST(
   request: NextRequest
-): Promise<NextResponse<CreateBookingResponse | { error: string; errors?: string[] }>> {
+): Promise<
+  NextResponse<CreateBookingResponse | { error: string; errors?: string[] }>
+> {
   try {
     // Simulate network delay
     await artificialDelay();
@@ -34,13 +35,17 @@ export async function POST(
 
     // Validate request body structure
     if (
-      typeof body !== 'object' ||
+      typeof body !== "object" ||
       body === null ||
-      !('serviceId' in body) ||
-      !('centerId' in body) ||
-      !('formData' in body)
+      !("serviceId" in body) ||
+      !("centerId" in body) ||
+      !("formData" in body)
     ) {
-      throw new AppError(ERROR_MESSAGES.INVALID_REQUEST, 'INVALID_REQUEST', 400);
+      throw new AppError(
+        ERROR_MESSAGES.INVALID_REQUEST,
+        "INVALID_REQUEST",
+        400
+      );
     }
 
     const { serviceId, centerId, formData } = body as CreateBookingRequest;
@@ -51,8 +56,8 @@ export async function POST(
     if (!validationResult.isValid) {
       return NextResponse.json(
         {
-          error: 'Validation failed',
-          errors: validationResult.errors.map((e) => e.message),
+          error: "Validation failed",
+          errors: validationResult.errors.map((e) => e.message)
         },
         { status: 400 }
       );
@@ -67,14 +72,12 @@ export async function POST(
       clientEmail: formData.clientEmail,
       date: formData.date,
       time: formData.time,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date().toISOString()
     };
 
-    // Save to storage
-    saveBookingToStorage(booking);
-
+    // Note: Storage is handled client-side in the useBooking hook
     const response: CreateBookingResponse = {
-      booking,
+      booking
     };
 
     return NextResponse.json(response, { status: 201 });
@@ -92,4 +95,3 @@ export async function POST(
     );
   }
 }
-

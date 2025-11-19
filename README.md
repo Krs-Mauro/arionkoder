@@ -120,15 +120,15 @@ Test trigger button on each center page. In dev mode, close Next.js error overla
 
 ## 🔍 Code Quality
 
-✅ Most files under 100 lines
-✅ No `any` or `unknown` types
-✅ No `console.log` (only `warn`/`error`)
-✅ Explicit return types
-✅ Readonly types for immutability
-✅ Low coupling, high cohesion
-✅ Comprehensive error handling
-✅ Accessible UI (ARIA labels, semantic HTML)
-✅ Passing tests
+✅ Most files under 100 lines  
+✅ No `any` or `unknown` types  
+✅ No `console.log` (only `warn`/`error`)  
+✅ Explicit return types  
+✅ Readonly types for immutability  
+✅ Low coupling, high cohesion  
+✅ Comprehensive error handling  
+✅ Accessible UI (ARIA labels, semantic HTML)  
+✅ Passing tests  
 ✅ Pre-push hooks enforce quality
 
 ## 🤖 AI-Assisted Development

@@ -8,11 +8,12 @@
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test": "jest --verbose=false",
+    "test:watch": "jest --watch --verbose=false",
+    "test:coverage": "jest --coverage --verbose=false",
     "type-check": "tsc --noEmit",
     "validate": "npm run type-check && npm run lint && npm run test",
+    "review": "npm run type-check && npm run lint && npm run test && npm run build && npm run start",
     "prepare": "node scripts/install-hooks.js"
   },
   "dependencies": {

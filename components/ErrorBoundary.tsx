@@ -1,6 +1,6 @@
 "use client";
 
-import { Component, ReactNode, type ReactElement } from "react";
+import { Component, ReactNode, useState, type ReactElement } from "react";
 import { Button } from "./Button";
 
 interface ErrorBoundaryProps {
@@ -81,12 +81,18 @@ export class ErrorBoundary extends Component<
  * Component that throws an error when clicked (for testing ErrorBoundary)
  */
 export function ErrorTrigger(): ReactElement {
-  const throwError = (): void => {
+  const [shouldThrow, setShouldThrow] = useState(false);
+
+  if (shouldThrow) {
     throw new Error("This is a test error triggered by the user");
+  }
+
+  const triggerError = (): void => {
+    setShouldThrow(true);
   };
 
   return (
-    <Button variant="danger" onClick={throwError}>
+    <Button variant="danger" onClick={triggerError}>
       Trigger Test Error
     </Button>
   );

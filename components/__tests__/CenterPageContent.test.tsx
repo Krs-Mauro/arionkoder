@@ -45,10 +45,6 @@ jest.mock("../CenterBookings", () => ({
   )
 }));
 
-jest.mock("../ErrorBoundaryTest", () => ({
-  ErrorBoundaryTest: () => <div data-testid="error-boundary-test" />
-}));
-
 const mockCenter: Center = {
   id: "center-1",
   slug: "bella-vita-spa",
@@ -134,18 +130,6 @@ describe("CenterPageContent", () => {
     expect(screen.getByTestId("center-bookings")).toBeInTheDocument();
     expect(screen.getByText("Bookings for Bella Vita Spa")).toBeInTheDocument();
     expect(screen.getByText("1 bookings")).toBeInTheDocument();
-  });
-
-  it("should render ErrorBoundaryTest component", () => {
-    render(
-      <CenterPageContent
-        center={mockCenter}
-        centerBookings={mockBookings}
-        onBookService={mockOnBookService}
-      />
-    );
-
-    expect(screen.getByTestId("error-boundary-test")).toBeInTheDocument();
   });
 
   it("should call onBookService when booking a service", async () => {

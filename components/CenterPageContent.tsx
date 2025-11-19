@@ -3,7 +3,6 @@ import { Center, Booking } from "@/types/domain";
 import { CenterHeader } from "./CenterHeader";
 import { CenterServices } from "./CenterServices";
 import { CenterBookings } from "./CenterBookings";
-import { ErrorBoundaryTest } from "./ErrorBoundaryTest";
 
 interface CenterPageContentProps {
   readonly center: Center;
@@ -25,9 +24,7 @@ export function CenterPageContent({
         <CenterHeader center={center} />
         <CenterServices services={center.services} onBook={onBookService} />
         <CenterBookings centerName={center.name} bookings={centerBookings} />
-        <ErrorBoundaryTest />
       </div>
     </div>
   );
 }
-
